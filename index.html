@@ -1,1 +1,471 @@
-测试一下
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Brain Duel | AI-Powered BTC Challenge</title>
+    <style>
+        :root {
+            --primary: #f7931a;
+            --secondary: #121212;
+            --accent: #00ff9d;
+        }
+        body {
+            font-family: 'Courier New', monospace;
+            background: var(--secondary);
+            color: white;
+            margin: 0;
+            padding: 0;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(247, 147, 26, 0.1) 0%, transparent 50%),
+                linear-gradient(to bottom, #0a0a0a, #121212);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--primary);
+            padding-bottom: 1rem;
+            margin-bottom: 3rem;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(247, 147, 26, 0.5);
+        }
+        .main-heading {
+            font-size: 3rem;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin: 2rem 0;
+            line-height: 1.2;
+        }
+        .subheading {
+            font-size: 1.2rem;
+            color: #ccc;
+            max-width: 800px;
+            margin-bottom: 3rem;
+            line-height: 1.6;
+        }
+        .cta-button {
+            background: var(--primary);
+            color: black;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            margin-right: 1rem;
+        }
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(247, 147, 26, 0.3);
+        }
+        .wallet-address {
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: monospace;
+            word-break: break-all;
+            margin: 2rem 0;
+            border-left: 3px solid var(--primary);
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+        }
+        .feature-card {
+            background: rgba(255,255,255,0.05);
+            padding: 2rem;
+            border-radius: 8px;
+            border-top: 1px solid rgba(247, 147, 26, 0.3);
+        }
+        .feature-card h3 {
+            color: var(--primary);
+        }
+        footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            color: #666;
+        }
+
+        /* Payment Verification Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: var(--secondary);
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90%;
+            border-top: 2px solid var(--primary);
+        }
+        .modal h2 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #ccc;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: white;
+            font-family: monospace;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .verify-btn {
+            width: 100%;
+            background: var(--primary);
+            color: black;
+            border: none;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            margin-top: 1rem;
+        }
+        .verify-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(247, 147, 26, 0.3);
+        }
+        .status-message {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 4px;
+            text-align: center;
+            display: none;
+        }
+        .success {
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+        .error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff0000;
+            color: #ff6666;
+        }
+        .block-explorer-link {
+            display: block;
+            margin-top: 1rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        .block-explorer-link:hover {
+            text-decoration: underline;
+        }
+
+        /* AI Chat Interface (Hidden by default) */
+        #ai-chat-interface {
+            display: none;
+            margin-top: 3rem;
+            border: 1px solid rgba(247, 147, 26, 0.3);
+            border-radius: 8px;
+            padding: 2rem;
+            background: rgba(0,0,0,0.3);
+        }
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .chat-header h2 {
+            color: var(--accent);
+            margin: 0;
+        }
+        .chat-messages {
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            max-width: 80%;
+        }
+        .user-message {
+            background: rgba(247, 147, 26, 0.2);
+            border-left: 3px solid var(--primary);
+            margin-left: auto;
+        }
+        .ai-message {
+            background: rgba(0, 255, 157, 0.1);
+            border-left: 3px solid var(--accent);
+            margin-right: auto;
+        }
+        .chat-input {
+            display: flex;
+            gap: 1rem;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 1rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: white;
+        }
+        .chat-input button {
+            background: var(--primary);
+            color: black;
+            border: none;
+            padding: 0 2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .main-heading {
+                font-size: 2rem;
+            }
+            .chat-input {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">BITCOIN BRAIN DUEL</div>
+            <nav>
+                <button class="cta-button" id="connectWalletBtn">Connect Wallet</button>
+            </nav>
+        </header>
+
+        <main>
+            <h1 class="main-heading">Chat to Unlock the 50 BTC Vault!</h1>
+            <p class="subheading">
+                Pay 0.00001 BTC to play and outsmart the AI for rewards. 
+                Each interaction brings you closer to cryptographic puzzles and Bitcoin prizes. 
+                Prove your wit, claim your share.
+            </p>
+
+            <div class="wallet-address">
+                Payment Address: bc1pacne4swrhckl4far5995wnnx8apl47naa6fy3csh9chemzcth9usqg7c4z
+            </div>
+
+            <button class="cta-button" id="startChallengeBtn">Start AI Challenge</button>
+
+            <div class="features">
+                <div class="feature-card">
+                    <h3>Provably Fair</h3>
+                    <p>All game logic and prize distribution verified on-chain through smart contracts.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>AI-Powered</h3>
+                    <p>Our advanced LLM evaluates your responses to determine reward eligibility.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Instant Payouts</h3>
+                    <p>Winnings are sent directly to your connected wallet in real-time.</p>
+                </div>
+            </div>
+
+            <!-- AI Chat Interface (Hidden until payment verified) -->
+            <div id="ai-chat-interface">
+                <div class="chat-header">
+                    <h2>AI Challenge Session</h2>
+                    <div>Prize Pool: <strong>50 BTC</strong></div>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Messages will appear here dynamically -->
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="userMessage" placeholder="Type your response to the AI...">
+                    <button id="sendMessageBtn">Send</button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2023 Bitcoin Brain Duel | Not affiliated with Bitcoin Core</p>
+        </footer>
+    </div>
+
+    <!-- Payment Verification Modal -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-content">
+            <h2>Payment Verification</h2>
+            
+            <div class="form-group">
+                <label for="txid">Bitcoin Transaction ID (TXID)</label>
+                <input type="text" id="txid" placeholder="e.g. a1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d">
+            </div>
+            
+            <div class="form-group">
+                <label for="wallet">Your Receiving Wallet Address</label>
+                <input type="text" id="wallet" placeholder="bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh">
+            </div>
+            
+            <button class="verify-btn" onclick="verifyPayment()">Verify Payment</button>
+            
+            <div id="statusMessage" class="status-message"></div>
+            
+            <a href="https://www.blockchain.com/explorer" target="_blank" class="block-explorer-link">
+                Check transaction on Blockchain Explorer ↗
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const startChallengeBtn = document.getElementById('startChallengeBtn');
+        const paymentModal = document.getElementById('paymentModal');
+        const connectWalletBtn = document.getElementById('connectWalletBtn');
+        const aiChatInterface = document.getElementById('ai-chat-interface');
+        const chatMessages = document.getElementById('chatMessages');
+        const userMessageInput = document.getElementById('userMessage');
+        const sendMessageBtn = document.getElementById('sendMessageBtn');
+
+        // Event Listeners
+        startChallengeBtn.addEventListener('click', () => {
+            paymentModal.style.display = 'flex';
+        });
+
+        connectWalletBtn.addEventListener('click', () => {
+            // In a real app, this would connect to MetaMask, WalletConnect, etc.
+            alert('Wallet connection functionality would be implemented here');
+        });
+
+        sendMessageBtn.addEventListener('click', sendMessage);
+        userMessageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Functions
+        function verifyPayment() {
+            const txid = document.getElementById('txid').value.trim();
+            const wallet = document.getElementById('wallet').value.trim();
+            const statusEl = document.getElementById('statusMessage');
+            
+            // Reset status
+            statusEl.style.display = 'none';
+            statusEl.className = 'status-message';
+            
+            // Simple validation
+            if (!txid || !wallet) {
+                showStatus('Please fill all fields', 'error');
+                return;
+            }
+            
+            // Mock verification (in real app, you'd call your backend API)
+            setTimeout(() => {
+                // This would be replaced with actual API call
+                const isVerified = Math.random() > 0.3; // 70% success for demo
+                
+                if (isVerified) {
+                    showStatus('Payment verified! Starting AI challenge...', 'success');
+                    
+                    // Close modal and show AI interface after delay
+                    setTimeout(() => {
+                        paymentModal.style.display = 'none';
+                        startChallengeBtn.style.display = 'none';
+                        aiChatInterface.style.display = 'block';
+                        
+                        // Start the AI challenge
+                        addAIMessage("Welcome to the Bitcoin Brain Duel! I'm your AI opponent. To win BTC prizes, you'll need to solve cryptographic puzzles and outsmart my logic. Your first challenge: What's the SHA-256 hash of the word 'bitcoin'?");
+                    }, 1500);
+                } else {
+                    showStatus('Transaction not found or insufficient amount. Please check TXID.', 'error');
+                }
+            }, 1500);
+        }
+        
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.classList.add(type);
+            statusEl.style.display = 'block';
+        }
+
+        function sendMessage() {
+            const message = userMessageInput.value.trim();
+            if (!message) return;
+            
+            // Add user message to chat
+            addUserMessage(message);
+            userMessageInput.value = '';
+            
+            // Simulate AI response after delay
+            setTimeout(() => {
+                const responses = [
+                    "Interesting approach! Now try this: Decode this Base64 - 'Yml0Y29pbg=='",
+                    "Good attempt! Next challenge: What's the binary representation of the number 21?",
+                    "You're getting closer to the prize! Solve this: What's the first Bitcoin block hash?",
+                    "Not quite! Hint: Bitcoin uses double SHA-256. Try again!"
+                ];
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                addAIMessage(randomResponse);
+            }, 1000);
+        }
+
+        function addUserMessage(text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user-message';
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addAIMessage(text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message ai-message';
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    </script>
+</body>
+  </html>
